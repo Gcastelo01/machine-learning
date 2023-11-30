@@ -1,5 +1,5 @@
 import pandas as pd
-from numpy import ndarray, insert, argsort
+from numpy import zeros, append, argsort
 
 
 class Point():
@@ -8,10 +8,10 @@ class Point():
         self.id = id
         self.estimated_label = False
         self.features = features
-        self.distances = ndarray((size[0], 3))
+        self.distances = zeros((size[0], 3))
         
     def insert_distance(self, id : int, dist : float) -> None:
-        self.distances = insert(self.distances, (id, dist), axis=0)
+        append(self.distances, (id, dist), axis=0)
         
         indices_ordem = argsort(self.distances[:, 1])
         
@@ -20,17 +20,33 @@ class Point():
 
 
 class LabeledPoint(Point):
-    def __init__(self, label, size : int, features: pd.DataFrame, id : int) -> None:
+    def __init__(self, label, features: pd.DataFrame, id : int) -> None:
         self.id = id
         self.label = label
         self.estimated_label = False
         self.features = features
-        self.distances = ndarray((size[0], 3))
+        self.distances = []
         
         
     def insert_distance(self, id : int, dist : float, label : bool) -> None:
-        self.distances = insert(self.distances, (id, dist, label), axis=0)
+        # Adiciona uma nova linha ao array distances
+        self.distances.append((id, dist, label))
         
-        indices_ordem = argsort(self.distances[:, 1])
         
-        self.distances = self.distances[indices_ordem] 
+    def ordain_dists(self) -> None:
+        self.distances.sort(key=lambda x: x[1])
+        
+        
+    def print_k_neightbours(self, k:int) -> int:
+        a = self.distances[:k]
+        print(a)
+        count = 0
+        
+        print(f"KNN do ponto {self.id}")
+        for i in range(k):
+            print(f"Vizinho {a[i][0]}: {a[i][1]}")
+            
+            if a[i][2]:
+                count += 1
+        
+        return count

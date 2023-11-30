@@ -1,8 +1,6 @@
 import pandas as pd
 import numpy as np
 from . import point as pt
-from numba import jit
-from math import ceil
 
 
 class KNNClassifier():
@@ -20,19 +18,21 @@ class KNNClassifier():
         self.__K = K
     
     @staticmethod
-    @jit
     def __get_distance(p1: pt.LabeledPoint, p2: pt.LabeledPoint) -> float:
         soma = sum(np.power(p1.features - p2.features, 2))
         return np.sqrt(soma)
     
+    def print_point_info(self, id:int) -> None:
+        a = self.__train_points.iloc[id].print_k_neightbours(self.__K)
+        
     
     def train(self) -> None:
         df_kein_label = self.__attrs.drop(self.__target, axis=1)
-        df_target = self.__attrs[[self.__target]]
+        df_target = self.__attrs[self.__target]
         
         # Salvando pontos do conjunto de treino 
         for idx, i in df_kein_label.iterrows():
-            novo = pt.LabeledPoint(df_target.iloc[idx], df_kein_label.shape, df_kein_label.iloc[idx], idx)
+            novo = pt.LabeledPoint(df_target.iloc[idx], df_kein_label.iloc[idx], idx)
 
             self.__train_points.append(novo)
         
@@ -41,21 +41,29 @@ class KNNClassifier():
             for j in self.__train_points:
                 if i.id != j.id:
                     dist = self.__get_distance(i, j)
-                    # i.insert_distance(j.id, dist, j.label)
-                    # j.insert_distance(i.id, dist, i.label)
-                    
-            if i.id % 2 == ceil(len(self.__train_points) / 2):
-                break
+                    i.insert_distance(j.id, dist, j.label)
+                    j.insert_distance(i.id, dist, i.label)
+            
+            i.ordain_dists()
         
-        # for i in self.__train_points:
-        #     knn = i.distances[:self.__K]
-        #     count_true = 0
+    def predict(self, data : pd.DataFrame) -> None:
+        pass
+    
+    def predict_point(self, data : pd.DataFrame) -> None:
+        
+        k_label = data.drop('TARGET_5Yrs')
+        
+        aux = pt.LabeledPoint(data['TARGET_5Yrs'], k_label, 1072)
+        
+        for i in self.__train_points:
+            dist = self.__get_distance(i, aux)
             
-        #     for j in knn[2]:
-        #         if j: count_true += 1
-            
-        #     if count_true >= self.__K:
-        #         i.estimated_label = True
-                
-        #     else:
-        #         i.estimated_label = False
+            aux.insert_distance(i.id, dist, i.label)
+        
+        a = aux.print_k_neightbours(self.__K)
+        
+        if a > self.__K:
+            print(f"Classificação: True. Real: {data['TARGET_5Yrs']}")  
+        else:  
+             print(f"Classificação: False. Real: {data['TARGET_5Yrs']}") 
+        
