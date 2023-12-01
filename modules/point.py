@@ -1,22 +1,24 @@
 import pandas as pd
-from numpy import zeros, append, argsort
-
+import numpy as np
 
 class Point():
-    
-    def __init__(self, size : int, features: pd.DataFrame, id : int) -> None:
+    def __init__(self, features: pd.DataFrame, id : int) -> None:
         self.id = id
-        self.estimated_label = False
         self.features = features
-        self.distances = zeros((size[0], 3))
+        self.distances = []
+
         
     def insert_distance(self, id : int, dist : float) -> None:
-        append(self.distances, (id, dist), axis=0)
-        
-        indices_ordem = argsort(self.distances[:, 1])
-        
-        self.distances = self.distances[indices_ordem] 
-        
+        self.distances.append((id, dist))
+    
+
+    def get_distance(self, p1) -> float:
+        soma = sum(np.power(self.features - p1.features, 2))
+        return np.sqrt(soma)
+
+
+    def ordain_dists(self) -> None:
+        self.distances.sort(key=lambda x: x[1])
 
 
 class LabeledPoint(Point):
@@ -29,14 +31,9 @@ class LabeledPoint(Point):
         
         
     def insert_distance(self, id : int, dist : float, label : bool) -> None:
-        # Adiciona uma nova linha ao array distances
         self.distances.append((id, dist, label))
         
-        
-    def ordain_dists(self) -> None:
-        self.distances.sort(key=lambda x: x[1])
-        
-        
+          
     def print_k_neightbours(self, k:int) -> int:
         a = self.distances[:k]
         print(a)
@@ -50,3 +47,17 @@ class LabeledPoint(Point):
                 count += 1
         
         return count
+    
+    
+    def k_neightbours(self, k: int) -> int:
+        count = 0
+        
+        for i in range(k):
+            if self.distances[i][2]:
+                count += 1
+        
+        if count >= k/2:
+            self.estimated_label = True
+            
+        else:
+            self.estimated_label = False
