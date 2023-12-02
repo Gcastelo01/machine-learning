@@ -6,7 +6,15 @@ class Point():
         self.id = id
         self.features = features
         self.distances = []
+        self.__group = -1
 
+    def set_group(self, g: int) -> None:
+        self.__group = g
+        
+    
+    def get_group(self) -> int:
+        return self.__group
+        
         
     def insert_distance(self, id : int, dist : float) -> None:
         self.distances.append((id, dist))
@@ -19,6 +27,14 @@ class Point():
 
     def ordain_dists(self) -> None:
         self.distances.sort(key=lambda x: x[1])
+        
+    def get_attrs_as_list(self, attrs: list) -> list:
+        resp = []
+        for i in attrs:
+            resp.append(self.features[i])
+            
+        return resp
+    
 
 
 class LabeledPoint(Point):

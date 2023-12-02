@@ -79,3 +79,41 @@ class KNNClassifier():
         else:  
              print(f"Classificação: False. Real: {data['TARGET_5Yrs']}") 
         
+        
+    def results(self, predicted: list) -> None:
+        vp = 0
+        vf = 0
+        fp = 0
+        ff = 0
+        
+        for i in predicted:
+            if i.estimated_label == i.label == True:
+                vp += 1
+                
+            elif i.estimated_label == i.label == False:
+                vf += 1
+            
+            elif i.estimated_label != i.label and i.label == True:
+                ff += 1
+                
+            else:
+                fp += 1
+        print(f"| Relatório de algoritmo KNN, K = {self.K} |")
+        print(f"""| MATRIZ DE CONFUSÃO |\n 
+              ------------------ \n 
+              |  {vp}  |  {ff}  |\n 
+              -------------------\n 
+              |  {fp}  |  {vf}  |\n 
+              -------------------\n""")
+        
+        acuracia = (vp + vf) / (vp+vf+ff+fp)
+        revocacao = vp / (vp + ff)
+        precisao = vp / (vp+fp)
+        f1 = (2 * precisao * revocacao)/(precisao + revocacao)
+        
+        print(f"""| MÉTRICAS |\n 
+              -> Acurácia: {acuracia * 100:.2f}\n 
+              -> Recall: {revocacao * 100:.2f} \n 
+              -> Precisão: {precisao * 100:.2f} \n 
+              -> Medida F1: {f1 * 100:.2f}""")
+    
