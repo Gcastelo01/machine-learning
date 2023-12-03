@@ -88,6 +88,10 @@ class KMeansClassifier():
                 self.__get_new_centroid()
             
         print(f"Algoritmo centrado para K = {self.K}")
+        
         for idx, i in enumerate(self.__groups):
             print(f"Grupo {idx}: {len(i)} pontos")
+        
+        for idx, i in enumerate(self.__centroids):
+            print(f"Centroide do Grupo {idx}: {i.features}")
     
