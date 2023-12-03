@@ -30,6 +30,7 @@ class KMeansClassifier():
     
     
     def train(self) -> None:
+        
         # Inserindo pontos na estrutura
         for idx, i in self.__df.iterrows():
             novo = pt.Point(i, idx)
@@ -88,10 +89,11 @@ class KMeansClassifier():
                 self.__get_new_centroid()
             
         print(f"Algoritmo centrado para K = {self.K}")
-        
+        print("| GRUPOS FORMADOS |\n")
         for idx, i in enumerate(self.__groups):
             print(f"Grupo {idx}: {len(i)} pontos")
         
+        print("\n| CENTRÓIDES |\n")
         for idx, i in enumerate(self.__centroids):
-            print(f"Centroide do Grupo {idx}: {i.features}")
+            print(f"Centroide do Grupo {idx}:\n {i.features}")
     

@@ -44,6 +44,10 @@ class KNNClassifier():
         
         
     def predict(self, data : pd.DataFrame):
+        """Dado um conjunto de dados não rotulados, prevê um resultado de classificação apra cada ponto deste conjunto
+        
+        @data: DataFrame com os pontos para classificação.
+        """
         l = []
         
         for idx, i in data.iterrows():
